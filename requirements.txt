@@ -1,0 +1,2 @@
+python-telegram-bot[rate-limiter]==20.7
+TZData>=2024.1; sys_platform == "win32"
