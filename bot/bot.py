@@ -35,12 +35,13 @@ class BookingBot:
 
     def __init__(self, token: str, store: BookingStore | None = None) -> None:
         self.store = store or BookingStore()
+        builder = ApplicationBuilder().token(token)
+        rate_limiter = self._build_rate_limiter()
+        if rate_limiter is not None:
+            builder = builder.rate_limiter(rate_limiter)
+
         self.application: Application = (
-            ApplicationBuilder()
-            .token(token)
-            .rate_limiter(AIORateLimiter())
-            .post_init(self._post_init)
-            .build()
+            builder.post_init(self._post_init).build()
         )
 
         self.application.add_handler(CommandHandler("start", self.start))
@@ -245,6 +246,17 @@ class BookingBot:
             text=f"Доступные слоты на {day.strftime('%d.%m.%Y')}:",
             reply_markup=slots_markup,
         )
+
+    def _build_rate_limiter(self) -> AIORateLimiter | None:
+        """Create a rate limiter instance if the dependency is available."""
+        try:
+            return AIORateLimiter()
+        except RuntimeError as exc:  # pragma: no cover - optional dependency branch
+            logger.warning(
+                "AIORateLimiter unavailable (%s). Continuing without rate limiting.",
+                exc,
+            )
+            return None
 
     def run(self) -> None:  # pragma: no cover - entry point
         self.application.run_polling()
