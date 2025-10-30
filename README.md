@@ -13,6 +13,8 @@
 
 - Python 3.10+
 - Telegram Bot Token (переменная окружения `TELEGRAM_TOKEN`)
+- Возможность устанавливать дополнительные зависимости из PyPI (используется 
+  пакет `python-telegram-bot` с extra `rate-limiter`)
 
 ## Установка и запуск
 
